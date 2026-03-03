@@ -23,3 +23,9 @@ h1{margin:0 0 10px;font-size:48px;line-height:1.05}
 
 .section-row td{background:#e6e6e6;font-weight:700;text-align:center}
 .sheet-sep td{background:#f2f2f2;font-weight:700}
+
+mark {
+  background: #fff176;
+  padding: 0 2px;
+  border-radius: 3px;
+}
