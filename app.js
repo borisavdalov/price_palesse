@@ -1,15 +1,11 @@
-console.log("app.js подключился ✅");
+console.log("app.js (GitHub direct fetch) ✅");
 
 const statusEl = document.getElementById("status");
 const searchEl = document.getElementById("search");
 const theadEl = document.getElementById("thead");
 const tbodyEl = document.getElementById("tbody");
 
-// === ТВОЙ APPS SCRIPT (jsonp) ===
-const PROXY =
-  "https://script.google.com/macros/s/AKfycbx0ZIdxSLASBP8v44Z0glEwjE7agWc5K-oM3zQUEWkriz4GP24cjNLMQBEq-uNxL9w8/exec";
-
-// === ЛИСТЫ: вставляй сюда ОРИГИНАЛЬНЫЕ CSV ссылки Google (pub?output=csv) ===
+// === ЛИСТЫ (твои published CSV) ===
 const SHEETS = [
   {
     name: "Гомсельмаш Брянсксельмаш",
@@ -43,24 +39,38 @@ function normalizeHeader(h) {
   return String(h ?? "").replace(/^\uFEFF/, "").replace(/\s+/g, " ").trim();
 }
 
-// CSV парсер (кавычки, переносы)
+// CSV парсер (кавычки, запятые, переносы)
 function parseCSV(text, delimiter = ",") {
   const rows = [];
-  let row = [], cell = "", inQuotes = false;
+  let row = [],
+    cell = "",
+    inQuotes = false;
 
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
     const next = text[i + 1];
 
-    if (c === '"' && inQuotes && next === '"') { cell += '"'; i++; continue; }
-    if (c === '"') { inQuotes = !inQuotes; continue; }
+    if (c === '"' && inQuotes && next === '"') {
+      cell += '"';
+      i++;
+      continue;
+    }
+    if (c === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
 
-    if (c === delimiter && !inQuotes) { row.push(cell); cell = ""; continue; }
+    if (c === delimiter && !inQuotes) {
+      row.push(cell);
+      cell = "";
+      continue;
+    }
 
     if ((c === "\n" || c === "\r") && !inQuotes) {
       if (c === "\r" && next === "\n") i++;
-      row.push(cell); cell = "";
-      if (row.some(v => String(v).trim() !== "")) rows.push(row);
+      row.push(cell);
+      cell = "";
+      if (row.some((v) => String(v).trim() !== "")) rows.push(row);
       row = [];
       continue;
     }
@@ -70,7 +80,7 @@ function parseCSV(text, delimiter = ",") {
 
   if (cell.length || row.length) {
     row.push(cell);
-    if (row.some(v => String(v).trim() !== "")) rows.push(row);
+    if (row.some((v) => String(v).trim() !== "")) rows.push(row);
   }
 
   return rows;
@@ -79,22 +89,22 @@ function parseCSV(text, delimiter = ",") {
 // Ищем строку заголовков (где есть "наимен")
 function rowsToObjects(rows) {
   if (!rows.length) return [];
-  let headerIndex = rows.findIndex(r =>
-    r.some(cell => String(cell).toLowerCase().includes("наимен"))
+  let headerIndex = rows.findIndex((r) =>
+    r.some((cell) => String(cell).toLowerCase().includes("наимен"))
   );
   if (headerIndex === -1) headerIndex = 0;
 
   const headers = rows[headerIndex].map(normalizeHeader);
 
-  return rows.slice(headerIndex + 1).map(r => {
+  return rows.slice(headerIndex + 1).map((r) => {
     const obj = {};
-    headers.forEach((h, i) => obj[h] = (r[i] ?? "").trim());
+    headers.forEach((h, i) => (obj[h] = (r[i] ?? "").trim()));
     return obj;
   });
 }
 
 function findKey(keys, includesAny) {
-  const low = keys.map(k => [k, k.toLowerCase()]);
+  const low = keys.map((k) => [k, k.toLowerCase()]);
   for (const inc of includesAny) {
     const needle = inc.toLowerCase();
     const found = low.find(([_, kl]) => kl.includes(needle));
@@ -103,6 +113,7 @@ function findKey(keys, includesAny) {
   return "";
 }
 
+// Если фото — ссылка drive /file/d/ID/view → делаем прямую
 function normalizeImageUrl(url) {
   if (!url) return "";
   const u = url.trim();
@@ -132,7 +143,9 @@ function isSectionRowByValues(name, spec, price) {
 
 function buildRow(item) {
   if (item.__sep) {
-    return `<tr class="sheet-sep"><td colspan="6">Лист: ${escapeHtml(item.__sheet)}</td></tr>`;
+    return `<tr class="sheet-sep"><td colspan="6">Лист: ${escapeHtml(
+      item.__sheet
+    )}</td></tr>`;
   }
 
   const k = item.__keys;
@@ -145,7 +158,9 @@ function buildRow(item) {
 
   if (isSectionRowByValues(name, spec, price)) {
     const title = name || spec;
-    return `<tr class="section-row"><td colspan="6">${escapeHtml(title)}</td></tr>`;
+    return `<tr class="section-row"><td colspan="6">${escapeHtml(
+      title
+    )}</td></tr>`;
   }
 
   const photoHtml = photo
@@ -168,17 +183,26 @@ let ALL = [];
 
 function render(items) {
   tbodyEl.innerHTML = items.map(buildRow).join("");
-  statusEl.textContent = `Показано: ${items.filter(x=>!x.__sep).length} / ${ALL.filter(x=>!x.__sep).length}`;
+  statusEl.textContent = `Показано: ${
+    items.filter((x) => !x.__sep).length
+  } / ${ALL.filter((x) => !x.__sep).length}`;
 }
 
 function applyFilter() {
   const q = (searchEl.value || "").trim().toLowerCase();
   if (!q) return render(ALL);
 
-  const filtered = ALL.filter(item => {
+  const filtered = ALL.filter((item) => {
     if (item.__sep) return true;
     const k = item.__keys;
-    const blob = [item[k.name], item[k.spec], item[k.price], item[k.type], item[k.plant], item.__sheet]
+    const blob = [
+      item[k.name],
+      item[k.spec],
+      item[k.price],
+      item[k.type],
+      item[k.plant],
+      item.__sheet,
+    ]
       .join(" ")
       .toLowerCase();
     return blob.includes(q);
@@ -187,55 +211,24 @@ function applyFilter() {
   render(filtered);
 }
 
-// JSONP (без CORS)
-function jsonpGet(csvUrl) {
-  return new Promise((resolve, reject) => {
-    const cbName = "cb_" + Math.random().toString(36).slice(2);
-    const script = document.createElement("script");
-    const timer = setTimeout(() => {
-      cleanup();
-      reject(new Error("JSONP timeout"));
-    }, 20000);
-
-    function cleanup() {
-      clearTimeout(timer);
-      delete window[cbName];
-      script.remove();
-    }
-
-    window[cbName] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-
-    script.onerror = () => {
-      cleanup();
-      reject(new Error("JSONP failed"));
-    };
-
-    script.src = `${PROXY}?url=${encodeURIComponent(csvUrl)}&callback=${cbName}`;
-    document.head.appendChild(script);
-  });
-}
-
 async function loadSheet(sheet) {
-  const payload = await jsonpGet(sheet.csv);
-  if (!payload || !payload.ok) throw new Error(`${sheet.name}: proxy error`);
-  if (payload.status && payload.status >= 400) throw new Error(`${sheet.name}: HTTP ${payload.status}`);
+  const resp = await fetch(sheet.csv, { cache: "no-store" });
+  if (!resp.ok) throw new Error(`${sheet.name}: HTTP ${resp.status}`);
 
-  const text = payload.text || "";
-  if (/^\s*</.test(text)) throw new Error(`${sheet.name}: пришёл HTML вместо CSV (проверь публикацию)`);
+  const text = await resp.text();
+  if (/^\s*</.test(text))
+    throw new Error(`${sheet.name}: пришёл HTML вместо CSV (проверь публикацию)`);
 
   const rows = parseCSV(text, ",");
   const data = rowsToObjects(rows);
 
   const keys = Object.keys(data[0] || {});
   const mapKeys = {
-    name:  findKey(keys, ["наимен"]),
+    name: findKey(keys, ["наимен"]),
     photo: findKey(keys, ["фото", "изображ"]),
-    spec:  findKey(keys, ["кратк", "характер", "комплект"]),
+    spec: findKey(keys, ["кратк", "характер", "комплект"]),
     price: findKey(keys, ["цена"]),
-    type:  findKey(keys, ["вид", "катег"]),
+    type: findKey(keys, ["вид", "катег"]),
     plant: findKey(keys, ["завод", "производ"]),
   };
   if (!mapKeys.name) throw new Error(`${sheet.name}: не найдена колонка "Наименование"`);
@@ -243,8 +236,8 @@ async function loadSheet(sheet) {
   const sep = { __sheet: sheet.name, __keys: mapKeys, __sep: true };
 
   const rowsData = data
-    .filter(x => Object.values(x).some(v => String(v).trim() !== ""))
-    .map(x => ({ ...x, __sheet: sheet.name, __keys: mapKeys }));
+    .filter((x) => Object.values(x).some((v) => String(v).trim() !== ""))
+    .map((x) => ({ ...x, __sheet: sheet.name, __keys: mapKeys }));
 
   return [sep, ...rowsData];
 }
@@ -259,7 +252,7 @@ async function main() {
     try {
       const data = await loadSheet(sheet);
       ALL.push(...data);
-      await new Promise(r => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 100));
     } catch (e) {
       console.warn(e);
       errors.push(e.message || String(e));
@@ -268,14 +261,14 @@ async function main() {
 
   render(ALL);
 
-  const loaded = ALL.filter(x=>!x.__sep).length;
+  const loaded = ALL.filter((x) => !x.__sep).length;
   statusEl.textContent = errors.length
     ? `Загружено: ${loaded}. Ошибки: ${errors.join(" | ")}`
     : `Загружено: ${loaded}`;
 }
 
 searchEl.addEventListener("input", applyFilter);
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   statusEl.textContent = "Ошибка загрузки/парсинга";
 });
