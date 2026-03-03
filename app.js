@@ -39,6 +39,16 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+function highlight(text, query) {
+  if (!query) return escapeHtml(text);
+
+  const safe = escapeHtml(text);
+  const q = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  const regex = new RegExp(`(${q})`, "gi");
+  return safe.replace(regex, `<mark>$1</mark>`);
+}
+
 function normalizeHeader(h) {
   return String(h ?? "").replace(/^\uFEFF/, "").replace(/\s+/g, " ").trim();
 }
