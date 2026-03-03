@@ -183,7 +183,7 @@ function buildRow(item) {
 
   return `
     <tr>
-      <td class="col-name">${escapeHtml(name)}</td>
+      <td class="col-name">${highlight(name, searchEl.value)}</td>
       <td class="col-photo">${photoHtml}</td>
       <td class="col-spec">${escapeHtml(spec)}</td>
       <td class="col-price">${escapeHtml(price)}</td>
