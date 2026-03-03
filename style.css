@@ -1,0 +1,25 @@
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111}
+.container{max-width:1200px;margin:0 auto;padding:18px}
+h1{margin:0 0 10px;font-size:48px;line-height:1.05}
+.toolbar{display:flex;gap:12px;align-items:center}
+#search{flex:0 0 360px;max-width:100%;padding:10px 12px;border:1px solid #cfcfcf;border-radius:8px;font-size:14px}
+.status{font-size:14px;color:#333}
+
+.table-wrap{border:1px solid #cfcfcf;border-radius:8px;overflow:auto}
+.price-table{border-collapse:collapse;min-width:980px;width:100%}
+.price-table th,.price-table td{border:1px solid #000;padding:10px;vertical-align:top}
+.price-table th{font-weight:700;text-align:center}
+.price-table td{font-size:13px}
+.col-name{width:220px}
+.col-photo{width:180px}
+.col-spec{width:520px}
+.col-price{width:140px;text-align:center;font-weight:700}
+.col-type{width:140px}
+.col-plant{width:140px}
+
+.cell-photo{display:flex;justify-content:center;align-items:center;min-height:80px}
+.cell-photo img{max-width:160px;max-height:120px;object-fit:contain}
+
+.section-row td{background:#e6e6e6;font-weight:700;text-align:center}
+.sheet-sep td{background:#f2f2f2;font-weight:700}
