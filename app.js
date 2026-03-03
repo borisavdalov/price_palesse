@@ -185,10 +185,10 @@ function buildRow(item) {
     <tr>
       <td class="col-name">${highlight(name, searchEl.value)}</td>
       <td class="col-photo">${photoHtml}</td>
-      <td class="col-spec">${escapeHtml(spec)}</td>
-      <td class="col-price">${escapeHtml(price)}</td>
-      <td class="col-type">${escapeHtml(type)}</td>
-      <td class="col-plant">${escapeHtml(plant)}</td>
+      <td class="col-spec">${highlight(spec, searchEl.value)}</td>
+      <td class="col-price">${highlight(price, searchEl.value)}</td>
+      <td class="col-type">${highlight(type, searchEl.value)}</td>
+      <td class="col-plant">${highlight(plant, searchEl.value)}</td>
     </tr>
   `;
 }
