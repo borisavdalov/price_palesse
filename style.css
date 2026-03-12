@@ -85,6 +85,7 @@ h1 {
 
 .col-spec {
   width: auto;
+  height: auto;
 }
 
 .col-price {
