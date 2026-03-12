@@ -1,4 +1,4 @@
-* {
+д* {
   box-sizing: border-box;
 }
 
@@ -76,40 +76,27 @@ h1 {
 
 /* Чёткие ширины колонок */
 .col-name {
-  width: 200px;
+  width: 220px;
 }
 
 .col-photo {
-  width: 130px;
-  text-align: center;
+  width: 140px;
 }
 
 .col-spec {
-  width: 820px;
+  width: auto;
 }
 
 .col-price {
-  width: 95px;
-  text-align: center;
-  font-weight: 800;
-  font-size: 14px;
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: normal;
+  width: 120px;
 }
 
 .col-type {
-  width: 120px;
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: break-word;
+  width: 140px;
 }
 
 .col-plant {
-  width: 110px;
-  white-space: normal;
-  word-break: normal;
-  overflow-wrap: break-word;
+  width: 120px;
 }
 
 /* Дополнительно страхуем шапку для этих колонок */
